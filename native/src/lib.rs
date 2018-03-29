@@ -11,7 +11,7 @@ use neon::js::JsValue;
 use neon::js::error::{JsError, Kind};
 use neon::vm::{Call, JsResult};
 
-use serde_bytes::{ByteBuf, Bytes};
+use serde_bytes::ByteBuf;
 
 #[derive(Deserialize)]
 struct Request {
@@ -45,7 +45,7 @@ fn hello(call: Call) -> JsResult<JsValue> {
 	let res_body = serde_json::to_vec(&res)
 		.or_else(|err| JsError::throw(Kind::Error, &err.to_string()))?;
 
-	let ret = neon_serde::to_value(scope, &Bytes::new(&res_body))?;
+	let ret = neon_serde::to_value(scope, &ByteBuf::from(res_body))?;
 
     Ok(ret)
 }
