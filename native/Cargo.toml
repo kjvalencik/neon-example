@@ -1,0 +1,21 @@
+[package]
+name = "neon-example"
+version = "0.1.0"
+authors = ["K.J. Valencik <kjvalencik@gmail.com>"]
+license = "MIT"
+build = "build.rs"
+
+[lib]
+name = "neon_example"
+crate-type = ["dylib"]
+
+[build-dependencies]
+neon-build = "0.1.22"
+
+[dependencies]
+neon = "0.1.22"
+serde = "1"
+serde_bytes = "0.10"
+serde_derive = "1"
+serde_json = "1"
+neon-serde = "*"

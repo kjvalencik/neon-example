@@ -1,0 +1,16 @@
+{
+  "name": "neon-example",
+  "version": "0.1.0",
+  "description": "",
+  "main": "src/index.js",
+  "author": "K.J. Valencik <kjvalencik@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.3",
+    "neon-cli": "^0.1.22"
+  },
+  "scripts": {
+    "install": "neon build"
+  }
+}
