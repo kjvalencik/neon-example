@@ -1,0 +1,7 @@
+native/Cargo.lock
+native/target
+native/index.node
+native/artifacts.json
+node_modules/
+npm-debug.log
+.git/
