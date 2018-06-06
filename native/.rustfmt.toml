@@ -1,0 +1,5 @@
+hard_tabs = true
+imports_indent = "Block"
+imports_layout = "HorizontalVertical"
+max_width = 80
+tab_spaces = 4
