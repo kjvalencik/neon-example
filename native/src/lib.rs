@@ -8,7 +8,9 @@ extern crate serde_bytes;
 extern crate serde_json;
 
 use neon::js::error::{JsError, Kind};
-use neon::js::{JsString, JsValue};
+use neon::js::{JsFunction, JsNumber, JsString, JsUndefined, JsValue};
+use neon::scope::Scope;
+use neon::task::Task;
 use neon::vm::{Call, JsResult};
 
 use serde_bytes::ByteBuf;
@@ -77,10 +79,34 @@ fn stringify(call: Call) -> JsResult<JsString> {
 	JsString::new_or_throw(scope, &s)
 }
 
+struct SuccessTask;
+
+impl Task for SuccessTask {
+    type Output = i32;
+    type Error = String;
+    type JsEvent = JsNumber;
+
+    fn perform(&self) -> Result<Self::Output, Self::Error> {
+        Ok(17)
+    }
+
+    fn complete<'a, T: Scope<'a>>(self, scope: &'a mut T, result: Result<Self::Output, Self::Error>) -> JsResult<Self::JsEvent> {
+        Ok(JsNumber::new(scope, result.unwrap() as f64))
+    }
+}
+
+fn perform_async_task(call: Call) -> JsResult<JsUndefined> {
+    let f = call.arguments.require(call.scope, 0)?.check::<JsFunction>()?;
+    SuccessTask.schedule(f);
+    Ok(JsUndefined::new())
+}
+
+
 register_module!(m, {
 	m.export("parse", parse)?;
 	m.export("stringify", stringify)?;
 	m.export("hello", hello)?;
+	m.export("performAsyncTask", perform_async_task)?;
 
 	Ok(())
 });

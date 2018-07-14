@@ -1,8 +1,15 @@
 'use strict';
 
 const assert = require('assert');
+const util = require('util');
 
-const { parse, stringify } = require('../native');
+const {
+	parse,
+	stringify,
+	performAsyncTask: performAsyncTaskCB
+} = require('../native');
+
+const performAsyncTask = util.promisify(performAsyncTaskCB);
 
 const fixture = {
 	a: 1,
@@ -16,3 +23,5 @@ const fixture = {
 assert.deepStrictEqual(parse(JSON.stringify(fixture)), fixture);
 assert.deepStrictEqual(JSON.parse(stringify(fixture)), fixture);
 assert.deepStrictEqual(parse(stringify(fixture)), fixture);
+
+performAsyncTask().then(res => assert.strictEqual(res, 17));
