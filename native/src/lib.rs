@@ -8,7 +8,7 @@ extern crate serde_bytes;
 extern crate serde_json;
 
 use neon::js::error::{JsError, Kind};
-use neon::js::{JsFunction, JsNumber, JsString, JsUndefined, JsValue};
+use neon::js::{Object, JsArray, JsFunction, JsNumber, JsObject, JsString, JsUndefined, JsValue};
 use neon::scope::Scope;
 use neon::task::Task;
 use neon::vm::{Call, JsResult};
@@ -102,11 +102,60 @@ fn perform_async_task(call: Call) -> JsResult<JsUndefined> {
 }
 
 
+fn array_process(call: Call) -> JsResult<JsUndefined> {
+	let scope = call.scope;
+	let arr = call.arguments.require(scope, 0)?.check::<JsArray>()?;
+
+	for i in 0..arr.len() {
+		let item = arr.get(scope, i)?.check::<JsObject>()?;
+		let operator = item.get(scope, "operator")?.check::<JsString>()?.value();
+		let value = item.get(scope, "value")?.check::<JsString>()?.value();
+
+		match operator.as_str() {
+			"print" => {
+				println!("{}", value);
+			},
+			_ => {
+				let msg = format!("Unsupported operator: {}", operator);
+
+				return JsError::throw(Kind::Error, &msg);
+			}
+		}
+    }
+
+	Ok(JsUndefined::new())
+}
+
+#[derive( Deserialize)]
+#[serde(tag = "operator")]
+enum Operation {
+	#[serde(rename = "print")]
+	Print { value: String }
+}
+
+fn array_process_serde(call: Call) -> JsResult<JsUndefined> {
+	let scope = call.scope;
+	let arg0 = call.arguments.require(scope, 0)?;
+	let ops: Vec<Operation> = neon_serde::from_value(scope, arg0)?;
+
+	for op in ops {
+		match op {
+			Operation::Print { value } => {
+				println!("{}", value);
+			}
+		}
+	}
+
+	Ok(JsUndefined::new())
+}
+
 register_module!(m, {
 	m.export("parse", parse)?;
 	m.export("stringify", stringify)?;
 	m.export("hello", hello)?;
 	m.export("performAsyncTask", perform_async_task)?;
+	m.export("arrayProcess", array_process)?;
+	m.export("arrayProcessSerde", array_process_serde)?;
 
 	Ok(())
 });
