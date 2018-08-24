@@ -90,12 +90,12 @@ dependencies = [
 
 [[package]]
 name = "neon"
-version = "0.1.22"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "cslice 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "neon-build 0.1.22 (registry+https://github.com/rust-lang/crates.io-index)",
- "neon-runtime 0.1.22 (registry+https://github.com/rust-lang/crates.io-index)",
+ "neon-build 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "neon-runtime 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "semver 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -105,12 +105,17 @@ version = "0.1.22"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
+name = "neon-build"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
 name = "neon-example"
 version = "0.1.0"
 dependencies = [
- "neon 0.1.22 (registry+https://github.com/rust-lang/crates.io-index)",
+ "neon 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "neon-build 0.1.22 (registry+https://github.com/rust-lang/crates.io-index)",
- "neon-serde 0.0.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "neon-serde 0.0.3 (git+https://github.com/apendleton/neon-serde?branch=oh-point-two)",
  "serde 1.0.36 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_bytes 0.10.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 1.0.36 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -119,10 +124,9 @@ dependencies = [
 
 [[package]]
 name = "neon-runtime"
-version = "0.1.22"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "cslice 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "gcc 0.3.54 (registry+https://github.com/rust-lang/crates.io-index)",
  "regex 0.2.10 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -130,11 +134,12 @@ dependencies = [
 [[package]]
 name = "neon-serde"
 version = "0.0.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
+source = "git+https://github.com/apendleton/neon-serde?branch=oh-point-two#caf7a3c8d568c572ecd0982e7cc6f9c083aa79e0"
 dependencies = [
  "cast 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "error-chain 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "neon 0.1.22 (registry+https://github.com/rust-lang/crates.io-index)",
+ "neon 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "neon-runtime 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.36 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -322,10 +327,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum lazy_static 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)" = "c8f31047daa365f19be14b47c29df4f7c3b581832407daabe6ae77397619237d"
 "checksum libc 0.2.40 (registry+https://github.com/rust-lang/crates.io-index)" = "6fd41f331ac7c5b8ac259b8bf82c75c0fb2e469bbf37d2becbba9a6a2221965b"
 "checksum memchr 2.0.1 (registry+https://github.com/rust-lang/crates.io-index)" = "796fba70e76612589ed2ce7f45282f5af869e0fdd7cc6199fa1aa1f1d591ba9d"
-"checksum neon 0.1.22 (registry+https://github.com/rust-lang/crates.io-index)" = "6f6078a0767408131206f802cb4ee2b1d78a035f23c209c3c0cb1dbe258a8737"
+"checksum neon 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "fd2e4dcd1e15c5944d89d283ec7c3b1b4ef83b5d2227b3b5d91d33224a45c7a3"
 "checksum neon-build 0.1.22 (registry+https://github.com/rust-lang/crates.io-index)" = "0220c1150ca0ac00df8fc1001dde699cf17762f208f43c497d90e91c910c0a17"
-"checksum neon-runtime 0.1.22 (registry+https://github.com/rust-lang/crates.io-index)" = "9a53b08f4dfc0ebc9ecb8bd8a02ace763e833d657f03614293254420a413c036"
-"checksum neon-serde 0.0.3 (registry+https://github.com/rust-lang/crates.io-index)" = "03eb25ea2c60da2b6331b9c4b0eb55ab565b1552721b99674a382514a754af45"
+"checksum neon-build 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "870c8f0b18ce83d8af6d95b9b723678aef55c047f29e09ac3e3d10ceecf57fd0"
+"checksum neon-runtime 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "ff1178addfa03e060fc79e795c21170823e69f0229b0b13a4a2585190ef8fa76"
+"checksum neon-serde 0.0.3 (git+https://github.com/apendleton/neon-serde?branch=oh-point-two)" = "<none>"
 "checksum num-traits 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)" = "dee092fcdf725aee04dd7da1d21debff559237d49ef1cb3e69bcb8ece44c7364"
 "checksum proc-macro2 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)" = "cd07deb3c6d1d9ff827999c7f9b04cdfd66b1b17ae508e14fe47b620f2282ae0"
 "checksum quote 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)" = "1eca14c727ad12702eb4b6bfb5a232287dcf8385cb8ca83a3eeaf6519c44c408"

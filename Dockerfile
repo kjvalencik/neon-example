@@ -31,7 +31,7 @@ RUN set -eux; \
 # Build application
 COPY . /src
 WORKDIR /src
-RUN npm install && ./node_modules/.bin/neon build
+RUN npm install && ./node_modules/.bin/neon build --release
 
 # Run tests
 RUN npm test
