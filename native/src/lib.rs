@@ -7,6 +7,11 @@ extern crate serde_derive;
 extern crate serde_bytes;
 extern crate serde_json;
 
+use std::sync::{Arc, Mutex};
+use std::sync::mpsc::{self, TryRecvError};
+use std::thread;
+use std::time::Duration;
+
 use neon::context::{Context, FunctionContext, TaskContext};
 use neon::object::Object;
 use neon::result::{JsResult, JsResultExt};
@@ -160,6 +165,112 @@ fn array_process_serde(mut cx: FunctionContext) -> JsResult<JsUndefined> {
 	Ok(JsUndefined::new())
 }
 
+pub enum Event {
+	Tick { count: f64 }
+}
+
+fn event_thread(rx: mpsc::Receiver<()>) -> mpsc::Receiver<Event> {
+	let (tx, events) = mpsc::channel();
+
+	thread::spawn(move || {
+		let mut count = 0.0;
+
+		loop {
+			thread::sleep(Duration::from_millis(500));
+
+			match rx.try_recv() {
+				Ok(_) | Err(TryRecvError::Disconnected) => {
+					break;
+				}
+				Err(TryRecvError::Empty) => {}
+			}
+
+			tx.send(Event::Tick { count }).expect("Send failed");
+			count += 1.0;
+		}
+	});
+
+	events
+}
+
+pub struct EventEmitter {
+	events: Arc<Mutex<mpsc::Receiver<Event>>>,
+	shutdown: mpsc::Sender<()>,
+}
+
+pub struct EventEmitterTask(Arc<Mutex<mpsc::Receiver<Event>>>);
+
+impl Task for EventEmitterTask {
+	type Output = Event;
+	type Error = String;
+	type JsEvent = JsObject;
+
+	fn perform(&self) -> Result<Self::Output, Self::Error> {
+		let rx = self.0.lock()
+			.map_err(|_| "Could not obtain lock on receiver".to_string())?;
+
+		rx.recv()
+			.map_err(|_| "Failed to receive event".to_string())
+	}
+
+	fn complete(
+		self,
+		mut cx: TaskContext,
+		event: Result<Self::Output, Self::Error>,
+	) -> JsResult<Self::JsEvent> {
+		let event = event
+			.or_else(|err| cx.throw_error(&err.to_string()))?;
+
+		let o = cx.empty_object();
+
+		match event {
+			Event::Tick { count } => {
+				let event_name = cx.string("tick");
+				let event_count = cx.number(count);
+
+				o.set(&mut cx, "event", event_name)?;
+				o.set(&mut cx, "count", event_count)?;
+			},
+		}
+
+		Ok(o)
+	}
+}
+
+declare_types! {
+	pub class JsEventEmitter for EventEmitter {
+		init(_) {
+			let (shutdown, shutdown_rx) = mpsc::channel();
+			let rx = event_thread(shutdown_rx);
+
+			Ok(EventEmitter {
+				events: Arc::new(Mutex::new(rx)),
+				shutdown,
+			})
+		}
+
+		method poll(mut cx) {
+			let cb = cx.argument::<JsFunction>(0)?;
+			let this = cx.this();
+			let events = cx.borrow(&this, |emitter| Arc::clone(&emitter.events));
+			let emitter = EventEmitterTask(events);
+
+			emitter.schedule(cb);
+
+			Ok(JsUndefined::new().upcast())
+		}
+
+		method shutdown(mut cx) {
+			let this = cx.this();
+
+			cx.borrow(&this, |emitter| emitter.shutdown.send(()))
+				.or_else(|err| cx.throw_error(&err.to_string()))?;
+
+			Ok(JsUndefined::new().upcast())
+		}
+	}
+}
+
 register_module!(mut cx, {
 	cx.export_function("parse", parse)?;
 	cx.export_function("stringify", stringify)?;
@@ -167,6 +278,7 @@ register_module!(mut cx, {
 	cx.export_function("performAsyncTask", perform_async_task)?;
 	cx.export_function("arrayProcess", array_process)?;
 	cx.export_function("arrayProcessSerde", array_process_serde)?;
+	cx.export_class::<JsEventEmitter>("EventEmitter")?;
 
 	Ok(())
 });
